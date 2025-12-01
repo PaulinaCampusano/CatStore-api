@@ -31,28 +31,33 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> {})
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(sess ->
-                        sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authorizeHttpRequests(auth -> auth
-                        // Swagger y login públicos
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/api/auth/**"
-                        ).permitAll()
-                        // Productos GET públicos
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                        // Crear/editar/borrar productos solo ADMIN
-                        .requestMatchers("/api/products/**").hasRole("ADMIN")
-                        // Lo demás, autenticado
-                        .anyRequest().authenticated()
-                )
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .cors(cors -> {})
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(sess ->
+                    sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authorizeHttpRequests(auth -> auth
+                    // Swagger y login públicos
+                    .requestMatchers(
+                            "/v3/api-docs/**",
+                            "/swagger-ui/**",
+                            "/swagger-ui.html",
+                            "/api/v1/auth/**"
+                    ).permitAll()
+                    
+                    .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+
+                    // ADMIN puede crear / editar / eliminar productos
+                    .requestMatchers("/api/v1/products/**").hasRole("ADMIN")
+
+                    // Órdenes solo ADMIN y VENDEDOR
+                    .requestMatchers("/api/v1/orders/**").hasAnyRole("ADMIN", "VENDEDOR")
+
+                    // Cualquier otra cosa requiere estar autenticado
+                    .anyRequest().authenticated()
+            )
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -4,6 +4,7 @@ import cl.catstore.catstore_api.entity.Order;
 import cl.catstore.catstore_api.entity.User;
 import cl.catstore.catstore_api.repository.UserRepository;
 import cl.catstore.catstore_api.service.OrderService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "BearerAuth")
 public class OrderController {
 
     private final OrderService orderService;
